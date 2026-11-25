@@ -1,36 +1,39 @@
-"""Entry point for the news-image-20261124 bounty entry.
+"""Publish the finished newspaper image for the grader.
 
-The artwork is pre-rendered and shipped alongside this script as
-``entry.png``. This script only copies it to ``/output/entry.png``,
-where the grader expects it. Pure Python standard library, nothing
-else is imported.
+This tiny script takes the entry.png that lives beside it and places
+a copy at /output/entry.png, which is where the grading harness
+expects the final artefact to appear.
 """
 
 import os
 import shutil
 
-SOURCE_NAME = "entry.png"
-DESTINATION = "/output/entry.png"
 
+def locate_entry_image():
+    """Return the path of the entry image in this script's folder.
 
-def source_path():
-    """Absolute path of the entry image next to this script."""
+    The image is always the file called entry.png sitting in the
+    same directory as this script, wherever the repo is checked out.
+    """
     here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, SOURCE_NAME)
+    return os.path.join(here, "entry.png")
 
 
-def copy_entry(src, dst):
-    """Copy the entry image to the output location and return its size."""
-    os.makedirs(os.path.dirname(dst), exist_ok=True)
-    shutil.copyfile(src, dst)
-    return os.path.getsize(dst)
+def publish_image():
+    """Copy the entry image into /output and report its size.
 
-
-def main():
-    size = copy_entry(source_path(), DESTINATION)
-    print(f"Wrote {DESTINATION} ({size} bytes)")
-    return 0
+    The destination folder is created when missing, so the copy
+    works on a clean machine with no /output directory yet.
+    """
+    source_path = locate_entry_image()
+    target_folder = "/output"
+    target_path = os.path.join(target_folder, "entry.png")
+    os.makedirs(target_folder, exist_ok=True)
+    shutil.copyfile(source_path, target_path)
+    written = os.path.getsize(target_path)
+    print(f"Wrote {written} bytes to {target_path}")
+    return written
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    publish_image()
